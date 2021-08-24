@@ -1,20 +1,46 @@
 package top.seraphjack.healthcheck.core;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import top.seraphjack.healthcheck.Constants;
 import top.seraphjack.healthcheck.TPSMonitor;
 
+import java.io.IOException;
+import java.util.Collections;
+
 public final class Report {
 
+    static final HttpClient client = HttpClientBuilder.create()
+            .setDefaultHeaders(Collections.singleton(new BasicHeader("Authorization", Constants.AUTHORIZE_TOKEN)))
+            .build();
+    static Logger logger = LogManager.getLogger();
+
+
     public static void onServerStart() {
-        System.out.println(Constants.SERVER_NAME + " started.");
+        try {
+            client.execute(Requests.serverStartRequest());
+        } catch (IOException e) {
+            logger.error("Failed to report server start", e);
+        }
+
     }
 
     public static void onServerStop() {
-        System.out.println(Constants.SERVER_NAME + " stopped.");
+        try {
+            client.execute(Requests.serverStopRequest());
+        } catch (IOException e) {
+            logger.error("Failed to report server stop", e);
+        }
     }
 
     public static void reportTPS(TPSMonitor.Result result) {
-        System.out.println(Constants.SERVER_NAME + " TPS report:");
-        System.out.printf("Last 1m, 5m, 10m: %.2f, %.2f, %.2f\n", result.last1m, result.last5m, result.last10m);
+        try {
+            client.execute(Requests.tpsRequest(result));
+        } catch (IOException e) {
+            logger.error("Failed to report server tps", e);
+        }
     }
 }
