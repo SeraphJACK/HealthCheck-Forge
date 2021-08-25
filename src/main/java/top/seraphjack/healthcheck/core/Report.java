@@ -1,6 +1,8 @@
 package top.seraphjack.healthcheck.core;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.logging.log4j.LogManager;
@@ -21,7 +23,8 @@ public final class Report {
 
     public static void onServerStart() {
         try {
-            client.execute(Requests.serverStartRequest());
+            HttpResponse response = client.execute(Requests.serverStartRequest());
+            HttpClientUtils.closeQuietly(response);
         } catch (IOException e) {
             logger.error("Failed to report server start", e);
         }
@@ -30,7 +33,8 @@ public final class Report {
 
     public static void onServerStop() {
         try {
-            client.execute(Requests.serverStopRequest());
+            HttpResponse response = client.execute(Requests.serverStopRequest());
+            HttpClientUtils.closeQuietly(response);
         } catch (IOException e) {
             logger.error("Failed to report server stop", e);
         }
@@ -38,7 +42,8 @@ public final class Report {
 
     public static void reportTPS(TPSMonitor.Result result) {
         try {
-            client.execute(Requests.tpsRequest(result));
+            HttpResponse response = client.execute(Requests.tpsRequest(result));
+            HttpClientUtils.closeQuietly(response);
         } catch (IOException e) {
             logger.error("Failed to report server tps", e);
         }
