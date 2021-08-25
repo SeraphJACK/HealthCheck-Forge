@@ -34,7 +34,7 @@ public final class TPSMonitor {
     public Result fetch() {
         double a, b = 0, c = 0;
         int min = minute - 1;
-        a = result[min];
+        a = result[min % 10];
         if (min >= 5) {
             for (int i = 0; i < 5; ++i) {
                 b += result[(min - i) % 10];

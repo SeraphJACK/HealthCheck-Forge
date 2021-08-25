@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import top.seraphjack.healthcheck.Constants;
 import top.seraphjack.healthcheck.TPSMonitor;
 
-import java.io.IOException;
 import java.util.Collections;
 
 public final class Report {
@@ -22,30 +21,37 @@ public final class Report {
 
 
     public static void onServerStart() {
+        HttpResponse response = null;
         try {
-            HttpResponse response = client.execute(Requests.serverStartRequest());
-            HttpClientUtils.closeQuietly(response);
-        } catch (IOException e) {
+            response = client.execute(Requests.serverStartRequest());
+        } catch (Exception e) {
             logger.error("Failed to report server start", e);
+        } finally {
+            HttpClientUtils.closeQuietly(response);
         }
 
     }
 
     public static void onServerStop() {
+        HttpResponse response = null;
         try {
-            HttpResponse response = client.execute(Requests.serverStopRequest());
-            HttpClientUtils.closeQuietly(response);
-        } catch (IOException e) {
+            response = client.execute(Requests.serverStopRequest());
+        } catch (Exception e) {
             logger.error("Failed to report server stop", e);
+        } finally {
+            HttpClientUtils.closeQuietly(response);
         }
     }
 
     public static void reportTPS(TPSMonitor.Result result) {
+        HttpResponse response = null;
         try {
-            HttpResponse response = client.execute(Requests.tpsRequest(result));
-            HttpClientUtils.closeQuietly(response);
-        } catch (IOException e) {
+            response = client.execute(Requests.tpsRequest(result));
+            logger.debug("Reporting to server current tps");
+        } catch (Exception e) {
             logger.error("Failed to report server tps", e);
+        } finally {
+            HttpClientUtils.closeQuietly(response);
         }
     }
 }
