@@ -47,11 +47,14 @@ public final class Report {
         HttpResponse response = null;
         try {
             response = client.execute(Requests.tpsRequest(result));
-            logger.debug("Reporting to server current tps");
         } catch (Exception e) {
             logger.error("Failed to report server tps", e);
         } finally {
-            HttpClientUtils.closeQuietly(response);
+            try {
+                HttpClientUtils.closeQuietly(response);
+            } catch (Exception e) {
+                logger.error("Failed to close response", e);
+            }
         }
     }
 }
