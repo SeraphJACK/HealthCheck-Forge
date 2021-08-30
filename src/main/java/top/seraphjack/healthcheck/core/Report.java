@@ -44,11 +44,19 @@ public final class Report {
     }
 
     public static void reportTPS(TPSMonitor.Result result) {
+        reportTPS(result, 3);
+    }
+
+    public static void reportTPS(TPSMonitor.Result result, int retryCount) {
         HttpResponse response = null;
         try {
             response = client.execute(Requests.tpsRequest(result));
         } catch (Exception e) {
-            logger.error("Failed to report server tps", e);
+            if (retryCount > 0) {
+                reportTPS(result, retryCount - 1);
+            } else {
+                logger.error("Failed to report server tps", e);
+            }
         } finally {
             try {
                 HttpClientUtils.closeQuietly(response);
