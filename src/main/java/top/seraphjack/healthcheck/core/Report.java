@@ -11,11 +11,14 @@ import top.seraphjack.healthcheck.Constants;
 import top.seraphjack.healthcheck.TPSMonitor;
 
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 public final class Report {
 
     static final HttpClient client = HttpClientBuilder.create()
             .setDefaultHeaders(Collections.singleton(new BasicHeader("Authorization", Constants.AUTHORIZE_TOKEN)))
+            .setConnectionTimeToLive(0, TimeUnit.SECONDS)
+            .disableAutomaticRetries()
             .build();
     static Logger logger = LogManager.getLogger();
 
