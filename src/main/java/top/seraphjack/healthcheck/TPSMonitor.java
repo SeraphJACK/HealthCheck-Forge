@@ -49,7 +49,7 @@ public final class TPSMonitor {
         } else {
             c = Double.NaN;
         }
-        return new Result(a, b / 5, c / 10);
+        return new Result(a, b / 5, c / 10, server.getPlayerCount());
     }
 
     // should be called every minute
@@ -69,13 +69,15 @@ public final class TPSMonitor {
 
     public static class Result {
         public final double last1m, last5m, last10m;
+        public final int playerCount;
 
-        Result(double a, double b, double c) {
+        Result(double a, double b, double c, int d) {
             last1m = a;
             if (Double.isNaN(b)) b = a;
             if (Double.isNaN(c)) c = b;
             last5m = b;
             last10m = c;
+            this.playerCount = d;
         }
 
         @Override

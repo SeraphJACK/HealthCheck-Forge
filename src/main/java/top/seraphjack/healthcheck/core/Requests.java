@@ -52,6 +52,7 @@ final class Requests {
         payload.addProperty("last1m", result.last1m);
         payload.addProperty("last5m", result.last5m);
         payload.addProperty("last10m", result.last10m);
+        payload.addProperty("player_count", result.playerCount);
         try {
             r.setEntity(new StringEntity(gson.toJson(payload)));
         } catch (UnsupportedEncodingException e) {
