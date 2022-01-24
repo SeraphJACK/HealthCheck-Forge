@@ -48,10 +48,12 @@ minecraft {
         }
     }
 }
+
 configurations {
     shadow
     compileOnly.extendsFrom(shadow)
 }
+
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.1-39.0.9'
     shadow 'org.apache.httpcomponents:httpclient:4.5.+'
@@ -60,8 +62,7 @@ dependencies {
 
 shadowJar {
     configurations = [project.configurations.shadow]
-    relocate 'org.apache.http', 'top.seraphjack.healthcheck.repack.org.apache.http'
-    relocate 'org.apache.commons.logging', 'top.seraphjack.healthcheck.repack.org.apache.commons.logging'
+    relocate 'org.apache', 'top.seraphjack.healthcheck.repack.org.apache'
 }
 
 reobf {
