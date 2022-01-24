@@ -2,14 +2,12 @@ package top.seraphjack.healthcheck;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import top.seraphjack.healthcheck.core.Report;
 
@@ -24,8 +22,8 @@ public class ModContainer {
     public TPSMonitor monitor;
 
     public ModContainer() {
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
-                () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (serverVer, isDedicated) -> true));
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
+                () -> new IExtensionPoint.DisplayTest(() -> "ANY", (remote, isServer) -> true));
         if (Constants.HC_ENDPOINT.isEmpty()) {
             LogManager.getLogger().warn("Not enabling health checker since HC_ENDPOINT variable is not set.");
             return;
@@ -34,7 +32,7 @@ public class ModContainer {
     }
 
     @SubscribeEvent
-    public void onServerStart(FMLServerStartedEvent event) {
+    public void onServerStart(ServerStartedEvent event) {
         monitor = new TPSMonitor(event.getServer());
         Report.onServerStart();
         executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
@@ -43,7 +41,7 @@ public class ModContainer {
     }
 
     @SubscribeEvent
-    public void onServerStop(FMLServerStoppingEvent event) {
+    public void onServerStop(ServerStoppingEvent event) {
         this.monitor.shutdown();
         this.executor.shutdown();
         Report.onServerStop();
