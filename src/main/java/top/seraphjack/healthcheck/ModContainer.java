@@ -3,7 +3,7 @@ package top.seraphjack.healthcheck;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -41,7 +41,7 @@ public class ModContainer {
     }
 
     @SubscribeEvent
-    public void onServerStop(ServerStoppingEvent event) {
+    public void onServerStop(ServerStoppedEvent event) {
         this.monitor.shutdown();
         this.executor.shutdown();
         Report.onServerStop();
