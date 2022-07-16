@@ -24,7 +24,7 @@ public class ModContainer {
     public ModContainer() {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
                 () -> new IExtensionPoint.DisplayTest(() -> "ANY", (remote, isServer) -> true));
-        if (Constants.HC_ENDPOINT.isEmpty()) {
+        if (Constants.HC_ENDPOINT == null || Constants.HC_ENDPOINT.isEmpty()) {
             LogManager.getLogger().warn("Not enabling health checker since HC_ENDPOINT variable is not set.");
             return;
         }
