@@ -1,48 +1,33 @@
 package top.seraphjack.healthcheck.core;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.message.BasicHeader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import top.seraphjack.healthcheck.Constants;
 import top.seraphjack.healthcheck.TPSMonitor;
 
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
 
 public final class Report {
 
-    static final HttpClient client = HttpClientBuilder.create()
-            .setDefaultHeaders(Collections.singleton(new BasicHeader("Authorization", Constants.AUTHORIZE_TOKEN)))
-            .setConnectionTimeToLive(0, TimeUnit.SECONDS)
-            .disableAutomaticRetries()
+    static final HttpClient client = HttpClient
+            .newBuilder()
             .build();
     static Logger logger = LogManager.getLogger();
 
-
     public static void onServerStart() {
-        HttpResponse response = null;
         try {
-            response = client.execute(Requests.serverStartRequest());
-        } catch (Exception e) {
+            client.send(Requests.serverStartRequest(), HttpResponse.BodyHandlers.discarding());
+        } catch (IOException | InterruptedException e) {
             logger.error("Failed to report server start", e);
-        } finally {
-            HttpClientUtils.closeQuietly(response);
         }
-
     }
 
     public static void onServerStop() {
-        HttpResponse response = null;
         try {
-            response = client.execute(Requests.serverStopRequest());
-        } catch (Exception e) {
+            client.send(Requests.serverStopRequest(), HttpResponse.BodyHandlers.discarding());
+        } catch (IOException | InterruptedException e) {
             logger.error("Failed to report server stop", e);
-        } finally {
-            HttpClientUtils.closeQuietly(response);
         }
     }
 
@@ -51,20 +36,13 @@ public final class Report {
     }
 
     public static void reportTPS(TPSMonitor.Result result, int retryCount) {
-        HttpResponse response = null;
         try {
-            response = client.execute(Requests.tpsRequest(result));
-        } catch (Exception e) {
+            client.send(Requests.tpsRequest(result), HttpResponse.BodyHandlers.discarding());
+        } catch (IOException | InterruptedException e) {
             if (retryCount > 0) {
                 reportTPS(result, retryCount - 1);
             } else {
-                logger.error("Failed to report server tps", e);
-            }
-        } finally {
-            try {
-                HttpClientUtils.closeQuietly(response);
-            } catch (Exception e) {
-                logger.error("Failed to close response", e);
+                logger.error("Failed to report tps", e);
             }
         }
     }

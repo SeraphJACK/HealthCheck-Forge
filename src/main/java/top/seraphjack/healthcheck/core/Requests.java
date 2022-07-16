@@ -2,12 +2,11 @@ package top.seraphjack.healthcheck.core;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import top.seraphjack.healthcheck.Constants;
 import top.seraphjack.healthcheck.TPSMonitor;
 
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.http.HttpRequest;
 
 final class Requests {
     private static final String baseUrl;
@@ -23,42 +22,37 @@ final class Requests {
         }
     }
 
-    static HttpPost serverStartRequest() {
-        HttpPost r = new HttpPost(baseUrl + "lifecycle");
-        try {
-            r.setEntity(new StringEntity(gson.toJson(SERVER_START)));
-            r.setHeader("Content-Type", "application/json");
-        } catch (UnsupportedEncodingException e) {
-            // not possible
-        }
-        return r;
+    static HttpRequest serverStartRequest() {
+        return HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "lifecycle"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", Constants.AUTHORIZE_TOKEN)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(SERVER_START)))
+                .build();
     }
 
-    static HttpPost serverStopRequest() {
-        HttpPost r = new HttpPost(baseUrl + "lifecycle");
-        try {
-            r.setEntity(new StringEntity(gson.toJson(SERVER_STOP)));
-            r.setHeader("Content-Type", "application/json");
-        } catch (UnsupportedEncodingException e) {
-            // not possible
-        }
-        return r;
+    static HttpRequest serverStopRequest() {
+        return HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "lifecycle"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", Constants.AUTHORIZE_TOKEN)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(SERVER_STOP)))
+                .build();
     }
 
-    static HttpPost tpsRequest(TPSMonitor.Result result) {
-        HttpPost r = new HttpPost(baseUrl + "status");
+    static HttpRequest tpsRequest(TPSMonitor.Result result) {
         JsonObject payload = new JsonObject();
         payload.addProperty("name", Constants.SERVER_NAME);
         payload.addProperty("last1m", result.last1m);
         payload.addProperty("last5m", result.last5m);
         payload.addProperty("last10m", result.last10m);
         payload.addProperty("player_count", result.playerCount);
-        try {
-            r.setEntity(new StringEntity(gson.toJson(payload)));
-        } catch (UnsupportedEncodingException e) {
-            // not possible
-        }
-        return r;
+        return HttpRequest.newBuilder()
+                .uri(URI.create(baseUrl + "status"))
+                .header("Content-Type", "application/json")
+                .header("Authorization", Constants.AUTHORIZE_TOKEN)
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(payload)))
+                .build();
     }
 
     static class LifecycleRequest {
