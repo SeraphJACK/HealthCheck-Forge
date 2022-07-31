@@ -7,11 +7,13 @@ import top.seraphjack.healthcheck.TPSMonitor;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 public final class Report {
 
     static final HttpClient client = HttpClient
             .newBuilder()
+            .connectTimeout(Duration.ofSeconds(5))
             .build();
     static Logger logger = LogManager.getLogger();
 
