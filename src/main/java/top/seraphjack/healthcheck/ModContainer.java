@@ -8,6 +8,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkConstants;
 import org.apache.logging.log4j.LogManager;
 import top.seraphjack.healthcheck.core.Report;
 
@@ -23,7 +24,7 @@ public class ModContainer {
 
     public ModContainer() {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-                () -> new IExtensionPoint.DisplayTest(() -> "ANY", (remote, isServer) -> true));
+                () -> new IExtensionPoint.DisplayTest(() -> NetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
         if (Constants.HC_ENDPOINT == null || Constants.HC_ENDPOINT.isEmpty()) {
             LogManager.getLogger().warn("Not enabling health checker since HC_ENDPOINT variable is not set.");
             return;
